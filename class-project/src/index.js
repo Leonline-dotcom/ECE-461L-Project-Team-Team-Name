@@ -7,7 +7,9 @@ import AppPage from './ApplicationPage';
 import {
   createBrowserRouter,
   RouterProvider,
+  BrowserRouter
 } from "react-router-dom";
+
 
 const router = createBrowserRouter([
   {
@@ -35,6 +37,12 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router}/>
+    <RouterProvider router={router} />
+{/* 
+    <BrowserRouter>
+    <SignUp />
+    </BrowserRouter> 
+    
+Stashed changes */}
   </React.StrictMode>
 );

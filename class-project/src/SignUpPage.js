@@ -10,16 +10,11 @@ const SignUp= () => {
     setPassword(val.target.value)
   }
     const clickHandler = () => {
-      //setInputText(inputText);
-      //<Routes>
-      //<Route path = "/user/:name"element={<inputText />}></Route>
-      //</Routes>
+
     };
     return (
     <div>
-        
         <center>
-            
             <h3>Sign-Up</h3>
             <h3>{User}</h3>
             <h3>Username</h3>
@@ -37,11 +32,14 @@ const SignUp= () => {
             ></input>
             <br></br>
             <button onClick={clickHandler}>Sign Up</button>
+            <div className="back-to-login-container">
+        Already have an account? <a href="/login">Login</a>
+      </div>
             
         </center>
     </div>
     );
     }
-
+    
 export default SignUp;
     

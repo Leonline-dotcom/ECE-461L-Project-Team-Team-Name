@@ -45,7 +45,9 @@ const SignUp= () => {
             ></input>
             <br></br>
             <button onClick={clickHandler}>Sign Up</button>
-            
+            <div className="back-to-login-container">
+        Already have an account? <a href="/login">Login</a>
+      </div>
         </center>
     </div>
     );

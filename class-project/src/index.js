@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import SignUp from './SignUpPage'
 import Login from './LoginPage'
+import AppPage from './ApplicationPage';
 import {
   createBrowserRouter,
   RouterProvider,
@@ -12,6 +13,10 @@ const router = createBrowserRouter([
   {
     path: "/",
     children:[
+      {
+        path:"appPage",
+        element: <AppPage/>
+      },
       {
         path: "login",
         element: <Login/>,
@@ -26,6 +31,6 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <SignUp/>
+    <RouterProvider router={router}/>
   </React.StrictMode>
 );

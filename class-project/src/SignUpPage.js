@@ -9,12 +9,25 @@ const SignUp= () => {
   function getPass(val){
     setPassword(val.target.value)
   }
-    const clickHandler = () => {
-
-    };
+  const clickHandler = () => {
+    
+    fetch("Sign-Up/"+User+"/"+Pass)
+    console.log(Pass) 
+    .then(response => response.json())
+    .then(function(data){
+    data=JSON.parse(data);
+    if(data.code===200)
+    {
+    setPassword(data.code)
+    }
+    })
+    console.log(Pass) 
+      }
     return (
     <div>
+        
         <center>
+            
             <h3>Sign-Up</h3>
             <h3>{User}</h3>
             <h3>Username</h3>
@@ -32,14 +45,11 @@ const SignUp= () => {
             ></input>
             <br></br>
             <button onClick={clickHandler}>Sign Up</button>
-            <div className="back-to-login-container">
-        Already have an account? <a href="/login">Login</a>
-      </div>
             
         </center>
     </div>
     );
     }
-    
+
 export default SignUp;
     

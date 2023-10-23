@@ -11,7 +11,7 @@ const SignUp= () => {
   }
   const clickHandler = () => {
     
-    fetch("Sign-Up/"+User+"/"+Pass)
+    fetch("signup/"+User+"/"+Pass)
     console.log(Pass) 
     .then(response => response.json())
     .then(function(data){

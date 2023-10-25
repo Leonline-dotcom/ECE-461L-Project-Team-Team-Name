@@ -30,9 +30,9 @@ const Login= () => {
               onChange={getPass}
             ></input>
             <br></br>
-            <button onClick={clickHandler}>Loginp</button>
+            <button onClick={clickHandler}>Login</button>
             <div className="back-to-login-container">
-        Don't have an account? <a href="/signup">SignUp</a>
+        Don't have an account? <a href="signup">SignUp</a>
       </div>
             
         </center>

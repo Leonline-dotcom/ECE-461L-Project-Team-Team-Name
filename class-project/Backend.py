@@ -75,6 +75,7 @@ def signup_check(User,Pass):
     if(collection.find_one({"Username": User})==None):
         token=encrypt(Pass)
         if(token=='Invalid'):
+            print('error')
             errorM = {"error": "Error: Invalid Password", "code": 404}
             client.close()
             return jsonify(errorM), 404
@@ -86,7 +87,7 @@ def signup_check(User,Pass):
         return jsonify(successM),200
     else:
         client.close()
-        failM=errorM = {"error": "Error: Username Is Already In Use. Please Try Again", "code": 404}
+        errorM = {"error": "Error: Username Is Already In Use. Please Try Again", "code": 404}
         return jsonify(errorM), 404
 
 

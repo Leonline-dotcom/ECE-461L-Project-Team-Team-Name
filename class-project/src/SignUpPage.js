@@ -65,14 +65,14 @@ const SignUp= () => {
             <div className={styles.errorcolor}>
 		        {errorMessage()}
 	          </div>
-            <h3>{User}</h3>
+            
             <h3>Username</h3>
             <input
               type="text"
               placeholder="Enter the Username..."
               onChange={getUser}
             ></input>
-            <h3>{Pass}</h3>
+            
             <h3>Password</h3>
             <input
               type="text"

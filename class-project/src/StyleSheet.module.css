@@ -12,7 +12,7 @@
       animation: App-logo-spin infinite 20s linear;
     }
   }
-  #stylish{
+  .errorcolor{
     color: red;
   }
   .App-header {

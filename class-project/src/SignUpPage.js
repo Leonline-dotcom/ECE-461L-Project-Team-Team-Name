@@ -1,10 +1,12 @@
 import React,  { useState } from "react";
 import ReactDOM from 'react-dom/client';
 import AppPage from './ApplicationPage';
+import styles from './StyleSheet.module.css'
 const SignUp= () => {
   const [User, setUsername] = useState("");
   const [Pass, setPassword]=useState("");
   const [error, setError] = useState(false);
+  const [errorMess, setErrorMess] = useState("");
   function getUser(val){
     setUsername(val.target.value)
   }
@@ -34,6 +36,7 @@ const SignUp= () => {
       }
       else{
         setError(true)
+        setErrorMess(data.error)
       }
       })
       
@@ -48,7 +51,7 @@ const SignUp= () => {
         style={{
         display: error ? '' : 'none',
         }}>
-        <p >Error: Username Is Already In Use. Please Try Again</p>
+        <p >{errorMess}</p>
       </div>
       );
     };
@@ -59,7 +62,7 @@ const SignUp= () => {
         <center>
             
             <h3>Sign-Up</h3>
-            <div className="messages">
+            <div className={styles.errorcolor}>
 		        {errorMessage()}
 	          </div>
             <h3>{User}</h3>

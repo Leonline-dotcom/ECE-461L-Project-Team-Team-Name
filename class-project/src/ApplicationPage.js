@@ -83,16 +83,16 @@ function AppPage() {
  
         {this.props.name}
           
-        
-        
-
-         
         </Box>
         <br/>
         <br/>
         <Grid container spacing={2}>
         <Grid xs={8}>
-        <Box sx={{ border: '1px dashed grey' } }>
+        <Box  sx={{ border: '1px dashed grey',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-evenly' } }>
+        <HardwareSet capacity = "200"/>
         <HardwareSet capacity = "200"/>
         </Box>
         </Grid>

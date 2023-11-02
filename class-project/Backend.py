@@ -13,6 +13,10 @@ Client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqg
 db = Client["Users"]
 collection=db["Users,Passwords,Projects"]
 
+Client= client =MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+db = Client["Users"]
+collection=db["Users,Passwords,Projects"]
+
 
 #Encryption
 def encrypt(input,Shift=5, Shifter=-1):
@@ -167,17 +171,17 @@ def checkIn_hardware(projectId, qty):
     return jsonify({"message": f"{qty} hardware checked in to {project['name']}"})
 
 #add project
-@app.route('/appPage/add_projects')
+
+@app.route('/add_projects', methods=['POST'])
 def add_project():
     data = request.get_json() # change this based on how font end passes name
-    name = data.get("projectId")
+    name = data.get("name")
 
     if not name:
         return jsonify({"message": "Project name is a required field"}), 400
-        
     
     new_project = {
-        "projectId": name,
+        "name": name,
         "hardware_qty": 0 
     }
 

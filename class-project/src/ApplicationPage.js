@@ -5,9 +5,13 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import {TextField} from '@mui/material';
 import { Grid } from '@mui/material';
- 
+import styles from './StyleSheet.module.css';
+import { useLocation } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 function AppPage() {
-
+  const location = useLocation();
+  const Username = location.state.data;
+  const navigate = useNavigate();
   class HardwareSet extends React.Component{
 
 
@@ -50,7 +54,16 @@ function AppPage() {
       console.log(this.state.amount )
       return(
         <div>
+          
+          
+          
+         
+          
+         
+          
           <center>
+          {this.props.name}
+          <br/>
           Capacity: {this.props.capacity} <br/>
           CheckedOut: {this.state.checkedOut} / {this.props.capacity}<br/>
           <TextField id="standard-basic" label="Amount" variant="standard"  onChange={this.handleamountChange}  input type="number"/><br/><br/>
@@ -76,12 +89,12 @@ function AppPage() {
     render(){
      return(
       
-      <div>
+      <div className="App">
          <br/>
          <br/>
          <Box  bgcolor="primary.main" sx={{ border: '1px dashed grey' } }>
- 
-        {this.props.name}
+        <center>{this.props.name}</center>
+        
           
         
         
@@ -91,39 +104,146 @@ function AppPage() {
         <br/>
         <br/>
         <Grid container spacing={2}>
-        <Grid xs={8}>
+        <Grid xs={12}>
         <Box sx={{ border: '1px dashed grey' } }>
-        <HardwareSet capacity = "200"/>
+        <HardwareSet capacity = "200" name='HwSet1'/>
+        <HardwareSet capacity = "200" name='HwSet2'/>
+        <br/>
+        <Button variant="contained" onClick={this.handleClick}>Leave</Button>
+        <br/>
+        <p></p>
         </Box>
         </Grid>
-        <Grid xs={4}>
-        <Box sx={{ border: '1px dashed grey' } }>
-        Member 1 <br/>
-        Member 2 <br/>
-        Member 3 <br/>
-        <Button variant="contained" onClick={this.handleClick}>Join</Button>
-        </Box>
-        </Grid>
+        
         </Grid>
       </div>
      )
     }
   }
+  class JoinProjects extends React.Component{
+    constructor(props){
+      super(props)
+      this.handleInputChange=this.handleInputChange.bind(this)
+      this.addItem=this.addItem.bind(this)
+      this.state = {
+        userInput:"",
+        list:[],
+      }
+      
+    }
 
+    handleInputChange= (e) => this.setState({ 
+      userInput: e.target.value 
+    }) 
+    addItem() {
+      if (this.state.userInput !== "") {
+        const newItem = {
+          name: this.state.userInput,
+          
+        };
+        this.setState((prevState) => ({
+          list: [...this.state.list, newItem],
+          userInput: "",
+          
+          }));
+                
+      }
+      
+    }
+    render(){
+      console.log(this.state.list)
+      return(
+       
+       <div>
+       <Grid className="list-group">
+          {this.state.list.map((item, index) => (
+            
+            <Box className="list-group-item" key={index}>
+               {item.index}
+               {console.log(item.index)}
+              <Project name={item.name} />
+            </Box>
+          ))}
+        </Grid>
+        <br/>
+        <br/>
+    <Grid container spacing={2}>
+        <Grid xs={6}>
+        <Box sx={{ border: '1px dashed grey' } }>
+        <center>
+        Create New Project
+        <br/>
+        <TextField id="standard-basic" label="Project Name" variant="standard" onChange={this.handleInputChange} /><br/><br/>
+        <Box><Button variant="contained" onClick={this.addItem}>Submit</Button> <br/></Box>
+        
+        <p></p>
+        </center>
+      
+
+        </Box>
+        </Grid>
+        
+        <Grid xs={6}>
+        <Box sx={{ border: '1px dashed grey' } }>
+        <center>
+        Join Existing Project
+        <br/>
+        <TextField id="standard-basic" label="Project Name" variant="standard" onChange={this.handleInputChange} /><br/><br/>
+        <Button variant="contained" onClick={this.addItem}>Submit</Button> <br/>
+        <p></p>
+        </center>
+      
+
+        </Box>
+        </Grid>
+        
+        </Grid>
+       </div>
+      )
+    }
+  }
+  class LogOutButton extends React.Component{
+    constructor(props){
+      super(props)
+      this.handleLogOut=this.handleLogOut.bind(this)
+    }
+    handleLogOut(){
+      navigate('/login')
+    }
+    render(){
+      return(
+        <div><Button variant="contained" onClick={this.handleLogOut}>Log Out</Button> <br/></div>
+        
+      )
+    }
+  }
   return (
     <div className="AppPage">
+     
+      <center>
+      <h2>{Username}</h2>
+      <LogOutButton/>
+        <h1 className={styles.header}> Project Page</h1>
+        
+        </center>
       
-      <h1 className={AppPage.header}> Project Page</h1>
       
-      <Project name = "Project 1"/>
+      {/* <Project name = "Project 1"/>
       <br/>
       <Project name = "Project 2"/>
       <br/>
       <Project name = "Project 3"/>
       <br/>
       <Project name = "Project 4"/>
-      <br/>
+      <br/> */}
+  
+        
+        <JoinProjects/>
 
+        
+        
+        
+        
     </div>
   );
 }

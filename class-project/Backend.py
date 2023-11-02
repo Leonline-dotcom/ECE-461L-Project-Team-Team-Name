@@ -120,42 +120,58 @@ def login_check(User,Pass):
 
 
 #checkout 
-# @app.route('/appPage/checkOut_hardware<projectID>/<int:qty>', methods=['POST'])
-# def checkOut_hardware(projectId, qty):
-#     Client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
-#     db = Client["Users"]
-#     collection=db["Projects"]
-#     project = collection.find_one({"_id": projectId})
-    
-#     if project is None:
-#         return jsonify({"message": "Project not found"}), 404
-#     available_qty = project.get("hardware_qty", 0)
+@app.route('/appPage/checkOut/<projectID>/<qty>/<HWSet>')
+def checkOut_hardware(projectID, qty, HWSet):
+    Client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+    db = Client["Users"]
+    collection=db["Projects"]
+    project = collection.find_one({"ProjectID": projectID})
+    print(HWSet)
+    HwQty=project.get(HWSet)
+    print(HwQty)
+    if(int(HwQty)+int(qty)<200):
+        new_qty=int(HwQty)+int(qty)
+        collection.update_one({"ProjectID": projectID}, {"$set": {HWSet: new_qty}})
+        Client.close()
+        return jsonify({'qty':new_qty,"code":200}),200
+    else:
+        collection.update_one({"ProjectID": projectID}, {"$set": {HWSet: 200}})
+        Client.close()
+        return jsonify({'qty':200,"code":200}),200
 
-#     if available_qty < qty:
-#         return jsonify({"message": f"Not enough hardware avaliable for {project['name']}"})
-    
-#     new_qty = available_qty - qty 
-#     collection.update_one({"_id": projectId}, {"$set": {"hardware_qty": new_qty}}) #only max of 200 change later
-
-#     return jsonify({"message": f"{qty} hardware checked out from {project['name']}"})
 
 
-# @app.route('/appPage/checkIn_hardware<projectID>/<int:qty>')
-# def checkIn_hardware(projectId, qty):
-#     Client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
-#     db = Client["Users"]
-#     collection=db["Projects"]
-#     project = collection.find_one({"_id": projectId})
+@app.route('/appPage/checkIn/<projectID>/<qty>/<HWSet>')
+def checkIn_hardware(projectID, qty, HWSet):
+    Client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+    db = Client["Users"]
+    collection=db["Projects"]
+    project = collection.find_one({"ProjectID": projectID})
+    print(HWSet)
+    HwQty=project.get(HWSet)
+    print(HwQty)
+    if(int(HwQty)-int(qty)>0):
+        new_qty=int(HwQty)-int(qty)
+        collection.update_one({"ProjectID": projectID}, {"$set": {HWSet: new_qty}})
+        Client.close()
+        return jsonify({'qty':new_qty,"code":200}),200
+    else:
+        collection.update_one({"ProjectID": projectID}, {"$set": {HWSet: 0}})
+        Client.close()
+        return jsonify({'qty':0,"code":200}),200
 
-#     if project is None:
-#         return jsonify({"message": "Project not found"}), 404
 
-#     new_qty = project.get("hardware_qty", 0) + qty
-#     collection.update_one({"_id": projectId}, {"$set": {"hardware_qty": new_qty}})
 
-#     return jsonify({"message": f"{qty} hardware checked in to {project['name']}"})
-
-# #add project
+@app.route('/appPage/getHardware/<projectID>/<HWSet>')
+def getHardware(projectID, HWSet):
+    Client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+    db = Client["Users"]
+    collection=db["Projects"]
+    project = collection.find_one({"ProjectID": projectID})
+    print(HWSet)
+    HwQty=project.get(HWSet)
+    Client.close()
+    return jsonify({'qty':HwQty,"code":200}),200
 
 @app.route('/appPage/addProject/<projectID>')
 def add_project(projectID):
@@ -205,15 +221,6 @@ def get_projects(Username):
     client.close()
     return jsonify({"projectlist":UserProjectList,"code":200}),200
 
-# #get user
-# #add project
-# #return all if successful
-# #return project id does not exist
-
-# @app.route('/appPage/returnExistingProject')
-# def find_existing_project(projectId):
-#     existing_project = collection.find_one({"projectId": projectId})
-#     return existing_project
 
 @app.route('/appPage/searchProject/<projectID>')
 def add_exisitng_project_to_user(projectID):
@@ -233,20 +240,7 @@ def leave_project(projectID, Username):
     update_query = {"$pull": {"Projects": projectID}}
     UserCollection.update_one({"Username": Username}, update_query)
     return jsonify({"code":200 }),200
-#     if not name:
-#         return jsonify({"message": "Project name is required"}), 400
 
-#     existing_project = find_existing_project(name)
-
-#     if existing_project:
-#         user = collection.find_one({"_id": User}) #change to match database formatting
-#         if "projectid" not in user: 
-#             user["projects"] = []
-#         user["projects"].append(existing_project)   #add project to user
-#         collection.update_one({"_id": User}, {"$set": user}) #update collection
-#         return jsonify({"message": "Project added to user's projects"})
-#     else:
-#         return jsonify({"message": "Project not found"}), 404
 
 @app.route('/')
 

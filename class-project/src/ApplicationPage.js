@@ -23,34 +23,82 @@ function AppPage() {
       this.handleClick=this.handleClick.bind(this)
       this.minusClick=this.minusClick.bind(this)
       this.handleamountChange=this.handleamountChange.bind(this)
-      
+      this.getHardware()
       this.state={
        checkedOut:0,
         amount:0, 
     }
     
   }
+  getHardware(){
+    const self = this;
+    fetch("appPage/getHardware/"+this.props.name+"/"+this.props.HWSetname)
+    
+    .then((response) => response.text())
+    //.then((data) => console.log(data))
+    .then(function(data){
+      
+     data=JSON.parse(data);
+      
+    
+  
+      if(data.code===200)
+      {
+        console.log(data)
+        self.setState({checkedOut:data.qty})
+        
+      }
+    }
+    )
+      
+    }
+  
   handleamountChange= (e) => this.setState({ 
 		amount: e.target.value 
 	}) 
  
     handleClick(){
-      if(parseInt(this.state.checkedOut) + parseInt(this.state.amount)<this.props.capacity){
-      var newCheckedOut = parseInt(this.state.checkedOut) + parseInt(this.state.amount)
-      this.setState({checkedOut: newCheckedOut})
-      }
-      else{
-        this.setState({checkedOut: this.props.capacity})
+      const self = this;
+    fetch("appPage/checkOut/"+this.props.name+"/"+this.state.amount+"/"+this.props.HWSetname)
+    
+    .then((response) => response.text())
+    //.then((data) => console.log(data))
+    .then(function(data){
+      
+     data=JSON.parse(data);
+      
+    
+  
+      if(data.code===200)
+      {
+        console.log(data)
+        self.setState({checkedOut:data.qty})
+        
       }
     }
+    )
+      
+    }
     minusClick(){
-      if(parseInt(this.state.checkedOut) - parseInt(this.state.amount)>0){
-        var newCheckedOut = parseInt(this.state.checkedOut) - parseInt(this.state.amount)
-        this.setState({checkedOut: newCheckedOut})
-        }
-        else{
-          this.setState({checkedOut: 0})
-        }
+      const self = this;
+    fetch("appPage/checkIn/"+this.props.name+"/"+this.state.amount+"/"+this.props.HWSetname)
+    
+    .then((response) => response.text())
+    //.then((data) => console.log(data))
+    .then(function(data){
+      
+     data=JSON.parse(data);
+      
+    
+  
+      if(data.code===200)
+      {
+        console.log(data)
+        self.setState({checkedOut:data.qty})
+        
+      }
+    }
+    )
       }
     
     render(){
@@ -66,7 +114,7 @@ function AppPage() {
          
           
           <center>
-          {this.props.name}
+          {this.props.HWSetname}
           <br/>
           Capacity: {this.props.capacity} <br/>
           CheckedOut: {this.state.checkedOut} / {this.props.capacity}<br/>
@@ -116,7 +164,8 @@ function AppPage() {
          <br/>
          <br/>
          <Box  bgcolor="primary.main" sx={{ border: '1px dashed grey' } }>
-        <center>{this.props.name}</center>
+        <center>{this.props.name} <br/>
+        <Button variant="contained" onClick={this.LeavehandleClick}>Leave</Button></center>
         
           
         
@@ -129,11 +178,11 @@ function AppPage() {
         <Grid container spacing={2}>
         <Grid xs={12}>
         <Box sx={{ border: '1px dashed grey' } }>
-        <HardwareSet capacity = "200" name='HwSet1'/>
-        <HardwareSet capacity = "200" name='HwSet2'/>
+        <HardwareSet capacity = "200" HWSetname='HWSet1' name={this.props.name}/>
+        <HardwareSet capacity = "200" HWSetname='HWSet2'name={this.props.name}/>
 
         <br/>
-        <Button variant="contained" onClick={this.LeavehandleClick}>Leave</Button>
+
         <p></p>
         </Box>
         </Grid>

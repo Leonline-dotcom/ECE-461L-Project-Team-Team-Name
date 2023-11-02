@@ -187,14 +187,23 @@ def addProjectToUser(projectID, Username):
 
     # Update the User document with the modified "Projects" list
     UserCollection.update_one({"Username": Username}, {"$set": {"Projects": UserProjectList}})
+    client.close()
     return jsonify({"code":200 }),200
 
 
 
-# @app.route('/appPage')
-# def get_projects():
-#     projects = list(collection.find({}, {"_id": 0}))
-#     return jsonify({"project": projects})
+@app.route('/appPage/getprojects/<Username>')
+def get_projects(Username):
+    print('hi get project')
+    client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+    db = client["Users"]
+    UserCollection = db["Users,Passwords,Projects"]
+
+    User = UserCollection.find_one({"Username": Username})
+    UserProjectList = User.get("Projects", [])
+    print(UserProjectList)
+    client.close()
+    return jsonify({"projectlist":UserProjectList,"code":200}),200
 
 # #get user
 # #add project
@@ -206,11 +215,16 @@ def addProjectToUser(projectID, Username):
 #     existing_project = collection.find_one({"projectId": projectId})
 #     return existing_project
 
-# @app.route('/appPage/search_Project')
-# def add_exisitng_project_to_user():
-#     data = request.get_json()
-#     User = data.get("User")
-#     name = data.get("projectId")# could be replaced with /appPage/. . ./<projectId>?
+@app.route('/appPage/searchProject/<projectID>')
+def add_exisitng_project_to_user(projectID):
+    client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+    db = client["Users"]
+    ProjectCollection = db["Projects"]
+
+    if(ProjectCollection.find_one({"ProjectID": projectID})!=None):
+        return jsonify({"code":200}),200
+    else:
+        return jsonify({"code":404}),404
 
 #     if not name:
 #         return jsonify({"message": "Project name is required"}), 400

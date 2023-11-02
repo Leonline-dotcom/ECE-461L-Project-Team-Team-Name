@@ -128,6 +128,8 @@ function AppPage() {
       super(props)
       this.handleInputChange=this.handleInputChange.bind(this)
       this.addItem=this.addItem.bind(this)
+      this.addExistingItem=this.addExistingItem.bind(this)
+      this.getProjectList()
       this.state = {
         userInput:"",
         list:[],
@@ -138,6 +140,7 @@ function AppPage() {
     handleInputChange= (e) => this.setState({ 
       userInput: e.target.value 
     }) 
+    
     addItem() {
       if (this.state.userInput !== "") {
       const stateString = JSON.stringify(this.state.userInput);
@@ -162,30 +165,78 @@ function AppPage() {
               fetch('appPage/addProjectToUser/' + stateString + '/' + Username)
               .then((response) => response.text())
         .then(function(data) {})
-            
+        for (let i = 0; i < 1000; i++) {
+        navigate('/appPage',{ state: { data: Username } });
+        }
+        ;
+            this.getProjectList()
+            window.location.reload()
           } else {
             setError(true);
             setErrorMess(data.message);
           }
+          
         });
     }
   }
+  addExistingItem() {
+    const stateString = JSON.stringify(this.state.userInput);
+    fetch('appPage/searchProject/' + stateString)
+      .then((response) => response.text())
+      .then(function (data) {
+        data = JSON.parse(data);
+  
+        if (data.code === 200) {
+          this.addItem(); 
+        } else {
+          console.log('error');
+        }
+      }.bind(this)); 
+  }
+  getProjectList(){
+    const self = this; // Store a reference to 'this'
+      
+    console.log('im talking to you');
+    fetch('appPage/getprojects/' + Username)
+    .then((response) => response.text())
+    .then(function(data) {
+      data = JSON.parse(data);
+
+      if (data.code === 200) {
+          self.setState((prevState) => ({
+            list: [...prevState.list, data.projectlist],
+            userInput: "",
+          }));
+        
+      } 
+    });
+
     
+  }
+ 
     render(){
       console.log(this.state.list)
+      
       return(
        
        <div>
        <Grid className="list-group">
-          {this.state.list.map((item, index) => (
-            
-            <Box className="list-group-item" key={index}>
-               {item.index}
-               {console.log(item.index)}
-              <Project name={item.name} />
-            </Box>
-          ))}
-        </Grid>
+  {this.state.list.map((item, index) => {
+    console.log(item);
+    return item.map((nestedItem, nestedIndex) => (
+      <Box className="list-group-item" key={nestedIndex}>
+        {console.log(nestedItem)}
+        <Project name={nestedItem} />
+      </Box>
+      
+    ));
+    
+  })}
+</Grid>
+
+
+
+
         <br/>
         <br/>
     <Grid container spacing={2}>
@@ -210,7 +261,7 @@ function AppPage() {
         Join Existing Project
         <br/>
         <TextField id="standard-basic" label="Project Name" variant="standard" onChange={this.handleInputChange} /><br/><br/>
-        <Button variant="contained" onClick={this.addItem}>Submit</Button> <br/>
+        <Button variant="contained" onClick={this.addExistingItem}>Submit</Button> <br/>
         <p></p>
         </center>
       

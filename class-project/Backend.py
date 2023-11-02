@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import cross_origin,CORS
 import logging
 from pymongo import MongoClient
@@ -8,6 +8,10 @@ app=Flask(__name__,static_folder='./build',static_url_path='/')
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+
+Client= client =MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+db = Client["Users"]
+collection=db["Users,Passwords,Projects"]
 
 
 #Encryption
@@ -94,7 +98,7 @@ def signup_check(User,Pass):
 @app.route('/login/<User>/<Pass>')
 @cross_origin()
 def login_check(User,Pass):
-    Client= client =MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+    Client = client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
     db = Client["Users"]
     collection=db["Users,Passwords,Projects"]
     if(collection.find_one({"Username": User})!=None):
@@ -125,3 +129,61 @@ def index():
     return app.send_static_file('index.html')
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=False, port=5000)
+
+#checkout 
+@app.route('/checkOut_hardware<projectID>/<int:qty>', methods=['POST'])
+def checkOut_hardware(projectId, qty):
+    Client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+    db = Client["Users"]
+    collection=db["Projects"]
+    project = collection.find_one({"_id": projectId})
+    
+    if project is None:
+        return jsonify({"message": "Project not found"}), 404
+    available_qty = project.get("hardware_qty", 0)
+
+    if available_qty < qty:
+        return jsonify({"message": f"Not enough hardware avaliable for {project['name']}"})
+    
+    new_qty = available_qty - qty 
+    collection.update_one({"_id": projectId}, {"$set": {"hardware_qty": new_qty}})
+
+    return jsonify({"message": f"{qty} hardware checked out from {project['name']}"})
+
+@app.route('/checkIn_hardware<projectID>/<int:qty>', methods=['POST'])
+def checkIn_hardware(projectId, qty):
+    Client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+    db = Client["Users"]
+    collection=db["Projects"]
+    project = collection.find_one({"_id": projectId})
+
+    if project is None:
+        return jsonify({"message": "Project not found"}), 404
+
+    new_qty = project.get("hardware_qty", 0) + qty
+    collection.update_one({"_id": projectId}, {"$set": {"hardware_qty": new_qty}})
+
+    return jsonify({"message": f"{qty} hardware checked in to {project['name']}"})
+
+#add project
+@app.route('/add_projects', methods=['POST'])
+def add_project():
+    data = request.get_json() # change this based on how font end passes name
+    name = data.get("name")
+
+    if not name:
+        return jsonify({"message": "Project name is a required field"}), 400
+    
+    new_project = {
+        "name": name,
+        "hardware_qty": 0 
+    }
+
+    result = collection.insert_one(new_project)
+    #change maybe? not sure if you need to pass in a project id or the name is the id
+    return jsonify({"message": "Project added sucessfully", "inserted_id": str(result.inserted_id)})
+
+@app.route('/projects', methods=['GET'])
+def get_projects():
+    projects = list(collection.find({}, {"_id": 0}))
+    return jsonify({"project": projects})

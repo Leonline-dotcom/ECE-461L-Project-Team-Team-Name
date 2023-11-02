@@ -33,7 +33,7 @@ function AppPage() {
   handleamountChange= (e) => this.setState({ 
 		amount: e.target.value 
 	}) 
-  
+ 
     handleClick(){
       if(parseInt(this.state.checkedOut) + parseInt(this.state.amount)<this.props.capacity){
       var newCheckedOut = parseInt(this.state.checkedOut) + parseInt(this.state.amount)
@@ -55,6 +55,7 @@ function AppPage() {
     
     render(){
       console.log(this.state.amount )
+      
       return(
         <div>
           
@@ -75,8 +76,12 @@ function AppPage() {
       <Button variant="contained" onClick={this.handleClick}>+</Button>
       <Button variant="contained" onClick={this.minusClick}>-</Button>
     </Box>
+    <br/>
+        
     </center>
+    
         </div>
+        
       )
     }
     
@@ -86,9 +91,24 @@ function AppPage() {
     
     constructor(props){
       super(props)
-
+      this.LeavehandleClick=this.LeavehandleClick.bind(this)
     }
-
+    LeavehandleClick(){
+      fetch('appPage/leaveProject/'+this.props.name+"/" + Username)
+    .then((response) => response.text())
+    .then(function(data) {
+      data = JSON.parse(data);
+  
+      if (data.code === 200) {
+        for (let i = 0; i < 1000; i++) {
+          navigate('/appPage',{ state: { data: Username } });
+          }
+        
+      } 
+    });
+  
+    
+  }
     render(){
      return(
       
@@ -111,9 +131,9 @@ function AppPage() {
         <Box sx={{ border: '1px dashed grey' } }>
         <HardwareSet capacity = "200" name='HwSet1'/>
         <HardwareSet capacity = "200" name='HwSet2'/>
+
         <br/>
-        <Button variant="contained" onClick={this.handleClick}>Leave</Button>
-        <br/>
+        <Button variant="contained" onClick={this.LeavehandleClick}>Leave</Button>
         <p></p>
         </Box>
         </Grid>

@@ -225,7 +225,14 @@ def add_exisitng_project_to_user(projectID):
         return jsonify({"code":200}),200
     else:
         return jsonify({"code":404}),404
-
+@app.route('/appPage/leaveProject/<projectID>/<Username>')
+def leave_project(projectID, Username):
+    client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+    db = client["Users"]
+    UserCollection = db["Users,Passwords,Projects"]
+    update_query = {"$pull": {"Projects": projectID}}
+    UserCollection.update_one({"Username": Username}, update_query)
+    return jsonify({"code":200 }),200
 #     if not name:
 #         return jsonify({"message": "Project name is required"}), 400
 

@@ -125,3 +125,24 @@ def index():
     return app.send_static_file('index.html')
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=False, port=5000)
+
+#checkout 
+@app.route('/checkOut_hardware<projectID>/<int:qty>', methods=['POST'])
+def checkOut_hardware(projectId, qty):
+    Client= client =MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+    db = Client["Users"]
+    collection=db["Projects"]
+    project = collection.find_one({"_id": projectId})
+    
+    if project is None:
+        return jsonify({"message": "Project not found"}), 404
+    available_qty = project.get("hardware_qty", 0)
+
+    if available_qty < qty:
+        return jsonify({"message": f"Not enough hardware avaliable for {project['name']}"})
+    
+    new_qty = available_qty - qty 
+    collection.update_one({"_id": projectId}, {"$set": {"hardware_qty": new_qty}})
+
+    return jsonify({"message": f"{qty} hardware checked out from {project['name']}"})
+    

@@ -1,6 +1,6 @@
 
 import './App.css';
-import React from 'react';
+import React, {useState} from 'react';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import {TextField} from '@mui/material';
@@ -8,10 +8,13 @@ import { Grid } from '@mui/material';
 import styles from './StyleSheet.module.css';
 import { useLocation } from 'react-router-dom'; 
 import { useNavigate } from 'react-router-dom';
+
 function AppPage() {
   const location = useLocation();
   const Username = location.state.data;
   const navigate = useNavigate();
+  const [error, setError] = useState(false);
+  const [errorMess, setErrorMess] = useState("");
   class HardwareSet extends React.Component{
 
 
@@ -137,19 +140,37 @@ function AppPage() {
     }) 
     addItem() {
       if (this.state.userInput !== "") {
-        const newItem = {
-          name: this.state.userInput,
-          
-        };
-        this.setState((prevState) => ({
-          list: [...this.state.list, newItem],
-          userInput: "",
-          
-          }));
-                
-      }
+      const stateString = JSON.stringify(this.state.userInput);
+      const self = this; // Store a reference to 'this'
       
+      console.log(this.state.userInput);
+      
+      fetch('appPage/addProject/' + stateString)
+        .then((response) => response.text())
+        .then(function(data) {
+          data = JSON.parse(data);
+    
+          if (data.code === 200) {
+            
+              const newItem = {
+                name: self.state.userInput,
+              };
+              self.setState((prevState) => ({
+                list: [...prevState.list, newItem], // Use prevState to update the list
+                userInput: "",
+              }));
+              fetch('appPage/addProjectToUser/' + stateString + '/' + Username)
+              .then((response) => response.text())
+        .then(function(data) {})
+            
+          } else {
+            setError(true);
+            setErrorMess(data.message);
+          }
+        });
     }
+  }
+    
     render(){
       console.log(this.state.list)
       return(

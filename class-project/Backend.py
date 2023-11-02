@@ -94,7 +94,7 @@ def signup_check(User,Pass):
 @app.route('/login/<User>/<Pass>')
 @cross_origin()
 def login_check(User,Pass):
-    Client= client =MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+    Client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
     db = Client["Users"]
     collection=db["Users,Passwords,Projects"]
     if(collection.find_one({"Username": User})!=None):
@@ -129,7 +129,7 @@ if __name__ == '__main__':
 #checkout 
 @app.route('/checkOut_hardware<projectID>/<int:qty>', methods=['POST'])
 def checkOut_hardware(projectId, qty):
-    Client= client =MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+    Client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
     db = Client["Users"]
     collection=db["Projects"]
     project = collection.find_one({"_id": projectId})

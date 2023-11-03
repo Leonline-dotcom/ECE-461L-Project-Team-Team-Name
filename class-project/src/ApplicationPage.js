@@ -148,9 +148,10 @@ function AppPage() {
       data = JSON.parse(data);
   
       if (data.code === 200) {
-        for (let i = 0; i < 1000; i++) {
-          navigate('/appPage',{ state: { data: Username } });
-          }
+        for (let i = 0; i < 1500; i++) {
+          
+        }
+        navigate('/appPage',{ state: { data: Username } });
         
       } 
     });
@@ -234,12 +235,11 @@ function AppPage() {
               fetch('appPage/addProjectToUser/' + stateString + '/' + Username)
               .then((response) => response.text())
         .then(function(data) {})
-        for (let i = 0; i < 1000; i++) {
-        navigate('/appPage',{ state: { data: Username } });
+        for (let i = 0; i < 5000; i++) {
+          
         }
-        ;
-            this.getProjectList()
-            window.location.reload()
+        navigate('/appPage',{ state: { data: Username } });
+
           } else {
             setError(true);
             setErrorMess(data.message);
@@ -256,12 +256,21 @@ function AppPage() {
         data = JSON.parse(data);
   
         if (data.code === 200) {
-          this.addItem(); 
+          fetch('appPage/addProjectToUser/' + stateString + '/' + Username)
+              .then((response) => response.text())
+        .then(function(data) {}) 
         } else {
           console.log('error');
         }
-      }.bind(this)); 
-  }
+        for (let i = 0; i < 1500; i++) {
+          
+          }
+          navigate('/appPage',{ state: { data: Username } });
+
+  }); 
+ 
+    ;
+}
   getProjectList(){
     const self = this; // Store a reference to 'this'
       

@@ -1,1 +1,1 @@
-web: team-team-name-backend.py
+web: gunicorn team-team-name-backend:app

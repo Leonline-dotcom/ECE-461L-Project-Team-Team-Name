@@ -3,7 +3,6 @@ from flask import Flask, request, jsonify
 from flask_cors import cross_origin,CORS
 import logging
 from pymongo import MongoClient
-from cryptography.fernet import Fernet;
 app=Flask(__name__,static_folder='./build',static_url_path='/')
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -124,20 +123,37 @@ def login_check(User,Pass):
 def checkOut_hardware(projectID, qty, HWSet):
     Client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
     db = Client["Users"]
+    HWCollection= db["HWCapacity"]
     collection=db["Projects"]
-    project = collection.find_one({"ProjectID": projectID})
-    print(HWSet)
-    HwQty=project.get(HWSet)
-    print(HwQty)
-    if(int(HwQty)+int(qty)<200):
-        new_qty=int(HwQty)+int(qty)
-        collection.update_one({"ProjectID": projectID}, {"$set": {HWSet: new_qty}})
-        Client.close()
-        return jsonify({'qty':new_qty,"code":200}),200
+    HW=''
+    if(HWSet=="HWSet1"):
+        HW="HW1"
     else:
-        collection.update_one({"ProjectID": projectID}, {"$set": {HWSet: 200}})
-        Client.close()
-        return jsonify({'qty':200,"code":200}),200
+        HW='HW2'
+    GlobalHWCapacity = HWCollection.find_one({"_id": ObjectId("65485f05c9acd35bff9c0217")})
+    
+   
+    HWCap = GlobalHWCapacity.get(HW)
+    if(HWCap!=0):
+        project = collection.find_one({"ProjectID": projectID})
+        print(HWSet)
+        HwQty=project.get(HWSet)
+        print(HwQty)
+        if(int(HwQty)+int(qty)<HWCap):
+            new_qty=int(HwQty)+int(qty)
+            updatedcap=HWCap-int(qty)
+            collection.update_one({"ProjectID": projectID}, {"$set": {HWSet: new_qty}})
+            HWCollection.update_one({"_id": ObjectId("65485f05c9acd35bff9c0217")}, {"$set": {HW: updatedcap}})
+            Client.close()
+            return jsonify({'qty':new_qty,"code":200}),200
+        else:
+            new_qty=int(HwQty)+int(HWCap)
+            collection.update_one({"ProjectID": projectID}, {"$set": {HWSet: new_qty}})
+            HWCollection.update_one({"_id": ObjectId("65485f05c9acd35bff9c0217")}, {"$set": {HW: 0}})
+            Client.close()
+            return jsonify({'qty':new_qty,"code":200}),200
+    else:
+        return jsonify({'errorcapmessage':"Sorry But There Is No More Hardware abled to be Checked Out At The Moment","code":404}),404
 
 
 
@@ -145,21 +161,38 @@ def checkOut_hardware(projectID, qty, HWSet):
 def checkIn_hardware(projectID, qty, HWSet):
     Client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
     db = Client["Users"]
+    HWCollection= db["HWCapacity"]
     collection=db["Projects"]
     project = collection.find_one({"ProjectID": projectID})
     print(HWSet)
     HwQty=project.get(HWSet)
     print(HwQty)
-    if(int(HwQty)-int(qty)>0):
-        new_qty=int(HwQty)-int(qty)
-        collection.update_one({"ProjectID": projectID}, {"$set": {HWSet: new_qty}})
-        Client.close()
-        return jsonify({'qty':new_qty,"code":200}),200
+    HW=''
+    if(HWSet=="HWSet1"):
+        HW="HW1"
     else:
-        collection.update_one({"ProjectID": projectID}, {"$set": {HWSet: 0}})
-        Client.close()
-        return jsonify({'qty':0,"code":200}),200
-
+        HW='HW2'
+    GlobalHWCapacity = HWCollection.find_one({"_id": ObjectId("65485f05c9acd35bff9c0217")})
+    
+   
+    HWCap = GlobalHWCapacity.get(HW)
+    
+    if(HwQty!=0):
+        if(int(HwQty)-int(qty)>0):
+            new_qty=int(HwQty)-int(qty)
+            updatedcap = HWCap+int(qty)
+            HWCollection.update_one({"_id": ObjectId("65485f05c9acd35bff9c0217")}, {"$set": {HW: updatedcap}})
+            collection.update_one({"ProjectID": projectID}, {"$set": {HWSet: new_qty}})
+            Client.close()
+            return jsonify({'qty':new_qty,"code":200}),200
+        else:
+            collection.update_one({"ProjectID": projectID}, {"$set": {HWSet: 0}})
+            updatedcap = HWCap+HwQty
+            HWCollection.update_one({"_id": ObjectId("65485f05c9acd35bff9c0217")}, {"$set": {HW: updatedcap}})
+            Client.close()
+            return jsonify({'qty':0,"code":200}),200
+    else:
+        return jsonify({'errorcapmessage':"You Do Not Have Any Hardware To Turn In","code":404}),404
 
 
 @app.route('/appPage/getHardware/<projectID>/<HWSet>')
@@ -180,9 +213,10 @@ def add_project(projectID):
     db = Client["Users"]
     
     Projectcollection=db["Projects"]
-    if(Projectcollection.find_one(projectID)):
+    print(Projectcollection.find_one({"ProjectID":projectID}))
+    if(Projectcollection.find_one({"ProjectID":projectID})!=None):
        client.close()
-       return jsonify({"message":"The Project Name"+projectID+"Is Not Available", "code":404 }),404
+       return jsonify({"message":"The Project Name "+projectID+" Is Not Available", "code":404 }),404
     else:
        
         
@@ -221,6 +255,25 @@ def get_projects(Username):
     client.close()
     return jsonify({"projectlist":UserProjectList,"code":200}),200
 
+from flask import jsonify
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+
+@app.route('/appPage/getcapacity')
+def get_capacity():
+    client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")
+    db = client["Users"]
+    Capacity = db["HWCapacity"]
+    
+
+    HWCapacity = Capacity.find_one({"_id": ObjectId("65485f05c9acd35bff9c0217")})
+    
+   
+    HW1 = HWCapacity.get("HW1")
+    HW2 = HWCapacity.get("HW2")
+    return jsonify({"HWSet1": HW1, "HWSet2": HW2, "code": 200}), 200
+
+
 
 @app.route('/appPage/searchProject/<projectID>')
 def add_exisitng_project_to_user(projectID):
@@ -231,7 +284,7 @@ def add_exisitng_project_to_user(projectID):
     if(ProjectCollection.find_one({"ProjectID": projectID})!=None):
         return jsonify({"code":200}),200
     else:
-        return jsonify({"code":404}),404
+        return jsonify({"message":projectID+" Does Not Exist","code":404}),404
 @app.route('/appPage/leaveProject/<projectID>/<Username>')
 def leave_project(projectID, Username):
     client = MongoClient("mongodb+srv://teamteamname1:BVGIa4PacDjqmSK6@cluster0.cvqgis3.mongodb.net/?retryWrites=true&w=majority")

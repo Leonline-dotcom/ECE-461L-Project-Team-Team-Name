@@ -15,6 +15,8 @@ function AppPage() {
   const navigate = useNavigate();
   const [error, setError] = useState(false);
   const [errorMess, setErrorMess] = useState("");
+  const [HWSet1Cap, setHWSet1Cap] = useState(0);
+  const [HWSet2Cap, setHWSet2Cap] = useState(0);
   class HardwareSet extends React.Component{
 
 
@@ -73,7 +75,9 @@ function AppPage() {
       {
         console.log(data)
         self.setState({checkedOut:data.qty})
-        
+        setTimeout(() => {
+          navigate('/appPage',{ state: { data: Username } });;
+        }, 500);
       }
     }
     )
@@ -95,7 +99,9 @@ function AppPage() {
       {
         console.log(data)
         self.setState({checkedOut:data.qty})
-        
+        setTimeout(() => {
+          navigate('/appPage',{ state: { data: Username } });;
+        }, 500);
       }
     }
     )
@@ -116,8 +122,8 @@ function AppPage() {
           <center>
           {this.props.HWSetname}
           <br/>
-          Capacity: {this.props.capacity} <br/>
-          CheckedOut: {this.state.checkedOut} / {this.props.capacity}<br/>
+          Global Capacity: {this.props.capacity} <br/>
+          CheckedOut: {this.state.checkedOut}<br/>
           <TextField id="standard-basic" label="Amount" variant="standard"  onChange={this.handleamountChange}  input type="number"/><br/><br/>
           <Box  >
         
@@ -140,18 +146,20 @@ function AppPage() {
     constructor(props){
       super(props)
       this.LeavehandleClick=this.LeavehandleClick.bind(this)
+      
     }
+    
+    
     LeavehandleClick(){
       fetch('appPage/leaveProject/'+this.props.name+"/" + Username)
     .then((response) => response.text())
     .then(function(data) {
       data = JSON.parse(data);
-  
+    
       if (data.code === 200) {
-        for (let i = 0; i < 1500; i++) {
-          
-        }
-        navigate('/appPage',{ state: { data: Username } });
+        setTimeout(() => {
+          navigate('/appPage',{ state: { data: Username } });;
+        }, 500);
         
       } 
     });
@@ -179,8 +187,8 @@ function AppPage() {
         <Grid container spacing={2}>
         <Grid xs={12}>
         <Box sx={{ border: '1px dashed grey' } }>
-        <HardwareSet capacity = "200" HWSetname='HWSet1' name={this.props.name}/>
-        <HardwareSet capacity = "200" HWSetname='HWSet2'name={this.props.name}/>
+        <HardwareSet capacity = {HWSet1Cap} HWSetname='HWSet1' name={this.props.name}/>
+        <HardwareSet capacity = {HWSet2Cap} HWSetname='HWSet2'name={this.props.name}/>
 
         <br/>
 
@@ -200,19 +208,31 @@ function AppPage() {
       this.addItem=this.addItem.bind(this)
       this.addExistingItem=this.addExistingItem.bind(this)
       this.getProjectList()
+      this.gobalCapacity()
       this.state = {
         userInput:"",
         list:[],
       }
       
     }
+    gobalCapacity(){
+      fetch('appPage/getcapacity')
+    .then((response) => response.text())
+    .then(function(data) {
+      data = JSON.parse(data);
+      setHWSet1Cap(data.HWSet1)
+      setHWSet2Cap(data.HWSet2)
+    })
+  }
 
     handleInputChange= (e) => this.setState({ 
       userInput: e.target.value 
     }) 
     
     addItem() {
+    
       if (this.state.userInput !== "") {
+      
       const stateString = JSON.stringify(this.state.userInput);
       const self = this; // Store a reference to 'this'
       
@@ -224,21 +244,14 @@ function AppPage() {
           data = JSON.parse(data);
     
           if (data.code === 200) {
-            
-              const newItem = {
-                name: self.state.userInput,
-              };
-              self.setState((prevState) => ({
-                list: [...prevState.list, newItem], // Use prevState to update the list
-                userInput: "",
-              }));
+            setErrorMess("")
+            setError(false)
               fetch('appPage/addProjectToUser/' + stateString + '/' + Username)
               .then((response) => response.text())
         .then(function(data) {})
-        for (let i = 0; i < 5000; i++) {
-          
-        }
-        navigate('/appPage',{ state: { data: Username } });
+        setTimeout(() => {
+          navigate('/appPage',{ state: { data: Username } });;
+        }, 500);
 
           } else {
             setError(true);
@@ -256,16 +269,21 @@ function AppPage() {
         data = JSON.parse(data);
   
         if (data.code === 200) {
+          setErrorMess("")
+          setError(false)
           fetch('appPage/addProjectToUser/' + stateString + '/' + Username)
               .then((response) => response.text())
         .then(function(data) {}) 
+        
+        setTimeout(() => {
+          navigate('/appPage',{ state: { data: Username } });;
+        }, 500);
+        
         } else {
-          console.log('error');
+          setError(true);
+            setErrorMess(data.message);
         }
-        for (let i = 0; i < 1500; i++) {
-          
-          }
-          navigate('/appPage',{ state: { data: Username } });
+        
 
   }); 
  
@@ -273,7 +291,6 @@ function AppPage() {
 }
   getProjectList(){
     const self = this; // Store a reference to 'this'
-      
     console.log('im talking to you');
     fetch('appPage/getprojects/' + Username)
     .then((response) => response.text())
@@ -311,12 +328,16 @@ function AppPage() {
     
   })}
 </Grid>
-
-
+<br/>
+        
+        <br/>
+<Grid className="errorcolor"><center>{errorMess}</center></Grid>
 
 
         <br/>
+        
         <br/>
+
     <Grid container spacing={2}>
         <Grid xs={6}>
         <Box sx={{ border: '1px dashed grey' } }>
@@ -378,14 +399,7 @@ function AppPage() {
         </center>
       
       
-      {/* <Project name = "Project 1"/>
-      <br/>
-      <Project name = "Project 2"/>
-      <br/>
-      <Project name = "Project 3"/>
-      <br/>
-      <Project name = "Project 4"/>
-      <br/> */}
+
   
         
         <JoinProjects/>

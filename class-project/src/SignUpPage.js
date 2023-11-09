@@ -2,11 +2,13 @@ import React,  { useState } from "react";
 import ReactDOM from 'react-dom/client';
 import AppPage from './ApplicationPage';
 import styles from './StyleSheet.module.css'
+import { useNavigate } from 'react-router-dom';
 const SignUp= () => {
   const [User, setUsername] = useState("");
   const [Pass, setPassword]=useState("");
   const [error, setError] = useState(false);
   const [errorMess, setErrorMess] = useState("");
+  const navigate = useNavigate();
   function getUser(val){
     setUsername(val.target.value)
   }
@@ -27,12 +29,9 @@ const SignUp= () => {
       if(data.code===200)
       {
         console.log("hi")
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(
-          <React.StrictMode>
-            <AppPage />
-          </React.StrictMode>
-        )
+        
+        
+        navigate('/appPage',{ state: { data: User } });
       }
       else{
         setError(true)

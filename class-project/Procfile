@@ -1,0 +1,1 @@
+web: gunicorn team-team-name-backend:app

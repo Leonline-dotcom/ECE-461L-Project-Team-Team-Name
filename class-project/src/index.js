@@ -37,12 +37,7 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
-{/* 
-    <BrowserRouter>
-    <SignUp />
-    </BrowserRouter> 
+    <RouterProvider router={router}/>
     
-Stashed changes */}
   </React.StrictMode>
 );
